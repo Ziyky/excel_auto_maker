@@ -1,9 +1,11 @@
 import time
+
+from openpyxl import Workbook
 from openpyxl.reader.excel import load_workbook
 
 from auto_gen_package.app_init import init_work_dir, DIR_INPUT, DIR_TEMPLATE, DIR_OUTPUT, init_filed_index
 from auto_gen_package.template import make_template, make_dest_monitor_info, make_script_ips, make_html_info, \
-    make_not_online, lst_online
+    make_not_online, lst_online, make_total_template_logs
 
 import warnings
 warnings.filterwarnings("ignore", message=r"Print area cannot be set to Defined name.*")
@@ -53,8 +55,16 @@ def main():
     make_html_info(ws_master)
     make_script_ips(ws_master)
 
-    #统计不在线情况
+    #统计不在线情况 + 已制作清单汇总
     make_not_online(lst_online,ws_master)
+    wb_list: list[Workbook] = []
+    for f in DIR_OUTPUT.glob("*迁移任务*.xlsx"):
+        if f.is_file():
+            wb = load_workbook(f)
+            wb_list.append(wb)
+            wb.close()
+    if wb_list is not None:
+        make_total_template_logs(wb_list)
 
     print("制作成功,已全部存放在data_output目录!")
 

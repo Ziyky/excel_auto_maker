@@ -144,3 +144,34 @@ def make_not_online(lst_ol:list,master:Worksheet):
         if row[app_init.MASTER_HEADER["桌面ID"]].value not in lst_ol:
             ws.append([row[app_init.MASTER_HEADER["桌面ID"]].value,row[app_init.MASTER_HEADER["迁移服务器"]].value])
     wb.save(DIR_LOG / "不在线情况统计表.xlsx")
+
+def make_total_template_logs(total:list[Workbook]):
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    header = [
+        "任务分组",
+        "源机名称*",
+        "源机IP",
+        "目标机名称",
+        "目标虚拟平台*",
+        "虚拟机分组*",
+        "运行位置",
+        "存储位置*",
+        "目标CPU核数",
+        "目标内存(GB)",
+        "同步磁盘",
+        "同步开始时间",
+        "同步周期",
+        "网络出口配置",
+        "网关配置",
+        "DNS配置"
+    ]
+    ws.append(header)
+    for wb_it in total:
+        ws_it = wb_it.active
+        for row in ws_it.iter_rows(min_row=5):
+            row_values = [cell.value for cell in row]
+            ws.append(row_values)
+
+    wb.save(DIR_LOG / "任务汇总.xlsx")
+    wb.close()
